@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/gateway}
+    username: ${DATABASE_USER:gateway}
+    password: ${DATABASE_PASSWORD:gateway}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+gateway:
+  # Name of the PSP adapter used when no routing rule overrides it.
+  default-psp: mock-psp
+  # Currency the merchant is settled in; FX is locked at authorize time.
+  settlement-currency: USD
+  # HMAC secret for signing webhook payloads. Practice only — override via
+  # WEBHOOK_SECRET in real use; never commit a real secret.
+  webhook-secret: ${WEBHOOK_SECRET:whsec_test_local_only}
+  webhook:
+    max-attempts: 3
+    backoff-base-ms: 1000
+  # How often the scheduled jobs run (webhook retries, ACH settlement).
+  webhook-retry-delay-ms: 30000
+  settlement-job-delay-ms: 30000
+  ach:
+    # Mock batch delay: an ACH capture settles this long after capture.
+    settlement-delay-ms: 172800000
+  routing:
+    # One country, two PSPs: primary + secondary, traffic split, overrides.
+    US:
+      primary: mock-psp
+      secondary: mock-psp-2
+      primary-percent: 100
+      # amount-threshold-minor: 100000   # >= $1,000 goes to the secondary
+      # secondary-methods: [ACH]         # these methods always use secondary
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.gateway: INFO

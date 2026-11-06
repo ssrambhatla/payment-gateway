@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:gateway-test;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+gateway:
+  # Tests: ACH settles immediately so the batch job is deterministic, webhook
+  # backoff is tiny, and the scheduled jobs are effectively disabled.
+  # NOTE: test application.yml replaces the main one, so routing must be
+  # repeated here (same values as main).
+  default-psp: mock-psp
+  settlement-currency: USD
+  webhook-secret: whsec_test_local_only
+  ach:
+    settlement-delay-ms: 0
+  webhook:
+    max-attempts: 3
+    backoff-base-ms: 10
+  webhook-retry-delay-ms: 3600000
+  settlement-job-delay-ms: 3600000
+  routing:
+    US:
+      primary: mock-psp
+      secondary: mock-psp-2
+      primary-percent: 100

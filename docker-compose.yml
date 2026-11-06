@@ -1,0 +1,17 @@
+# Practice-only Postgres for local development (Milestone M1).
+# The app itself runs via `mvn spring-boot:run` (no app container in M1).
+services:
+  postgres:
+    image: postgres:16
+    container_name: gateway-postgres
+    environment:
+      POSTGRES_DB: gateway
+      POSTGRES_USER: gateway
+      POSTGRES_PASSWORD: gateway
+    ports:
+      - "5432:5432"
+    volumes:
+      - gateway-data:/var/lib/postgresql/data
+
+volumes:
+  gateway-data:
